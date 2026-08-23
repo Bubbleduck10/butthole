@@ -4,10 +4,11 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>butthole.bot — a trading desk with no risk management</title>
-<meta name="description" content="We forked a 99,293-star institutional trading framework and deleted the analysts, the researchers, the portfolio managers and the entire risk committee. One employee survived.">
+<meta name="description" content="We forked a 99,293-star institutional trading framework and deleted the analysts, the researchers, the portfolio managers and the entire risk committee. One employee survived. Click him.">
 <meta property="og:title" content="butthole.bot">
-<meta property="og:description" content="86 files changed. 10,783 deletions. One employee left.">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%230c0c0d'/><text x='50' y='70' font-size='56' text-anchor='middle' fill='%2322c55e' font-family='monospace'>B</text></svg>">
+<meta property="og:description" content="86 files changed. 10,783 deletions. One employee left. Click him and he trades.">
+<meta property="og:image" content="assets/banner.png">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%230c0c0d'/><circle cx='50' cy='50' r='30' fill='%23e8683c'/><circle cx='50' cy='50' r='11' fill='%23fff5ee'/></svg>">
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -20,20 +21,45 @@
   </div>
 </header>
 
+<!-- ============ interactive hero ============ -->
 <section class="hero">
-  <div class="wrap">
-    <p class="eyebrow">MULTI-AGENT TRADING FRAMEWORK — SINGLE AGENT REMAINING</p>
-    <h1>We deleted<br>risk management.</h1>
-    <p class="sub">TradingAgents is a <strong id="stars">99,293</strong>-star framework that simulates an
-    institutional trading desk: four analysts covering fundamentals, sentiment, news and technicals; a
-    bull and a bear researcher debating every round; a research manager writing the investment plan; a
-    risk committee reviewing it; a portfolio manager signing it off.</p>
-    <p class="sub">We forked it and removed all of them.</p>
-    <div class="cta">
-      <a id="buy" class="btn" target="_blank" rel="noopener">BUY $BUTTHOLE ›</a>
-      <a href="#roster" class="btn ghost">THE ROSTER ›</a>
-      <a href="#kept" class="btn ghost">WHAT WE KEPT ›</a>
+  <div class="wrap hero-in">
+
+    <div class="hero-copy">
+      <p class="eyebrow">SOLE SURVIVING EMPLOYEE</p>
+      <h1>He has no analysts.<br>He has no risk&nbsp;committee.<br>He trades anyway.</h1>
+      <p class="sub">We forked a <strong id="stars">99,293</strong>-star institutional trading framework
+      and deleted the analysts, the researchers, the portfolio managers, and the entire risk management
+      department. <strong>86 files. 10,783 deletions.</strong> He is what was left.</p>
+      <div class="cta">
+        <a id="buy" class="btn" target="_blank" rel="noopener">BUY $BUTTHOLE ›</a>
+        <a href="#roster" class="btn ghost">SEE WHO WE FIRED ›</a>
+      </div>
     </div>
+
+    <div class="hero-bot">
+      <div id="stage" class="stage">
+        <img id="bot" src="assets/bot.png" alt="the trader" draggable="false">
+        <button id="hotspot" class="hotspot" aria-label="do not press this"></button>
+        <div id="pop" class="pop"></div>
+      </div>
+      <p class="prod" id="prod">click him</p>
+      <div class="tally">
+        <span class="tally-k">TRADES EXECUTED</span>
+        <span class="tally-v" id="trade-count">0</span>
+        <span class="tally-k">DELIBERATION</span>
+        <span class="tally-v red">0.00s</span>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ============ execution log ============ -->
+<section class="logwrap">
+  <div class="wrap">
+    <div class="log-h"><span>EXECUTION LOG</span><span class="log-note" id="log-note">unsupervised · unreviewed · unstoppable</span></div>
+    <ul id="log" class="log"><li class="idle">awaiting instruction from a supervisor who does not exist</li></ul>
   </div>
 </section>
 
@@ -45,10 +71,10 @@
       <div class="cell"><div class="k">FILES CHANGED</div><div class="v" id="s-files">86</div><div class="n">in a single commit</div></div>
       <div class="cell"><div class="k">LINES DELETED</div><div class="v red" id="s-lines">10,783</div><div class="n">of institutional deliberation</div></div>
       <div class="cell"><div class="k">RISK COMMITTEES</div><div class="v red">0</div><div class="n">down from one</div></div>
-      <div class="cell"><div class="k">EMPLOYEES REMAINING</div><div class="v green">1</div><div class="n">the trader</div></div>
+      <div class="cell"><div class="k">EMPLOYEES REMAINING</div><div class="v green">1</div><div class="n">pictured above</div></div>
     </div>
-    <p class="fine">The commit is titled <code>Dissolve the firm</code>. The diffstat is real and the
-    four directories return 404, which anyone can check.</p>
+    <p class="fine">The commit is titled <code>Dissolve the firm</code>. The diffstat is real and the four
+    directories return 404, which anyone can check.</p>
   </section>
 
   <section class="panel" id="roster">
@@ -56,50 +82,33 @@
     <div class="roster">
       <div class="dept gone">
         <div class="dept-h">ANALYSTS <span class="tag">TERMINATED</span></div>
-        <ul>
-          <li>Fundamentals Analyst</li>
-          <li>Sentiment Analyst</li>
-          <li>News Analyst</li>
-          <li>Technicals Analyst</li>
-        </ul>
+        <ul><li>Fundamentals Analyst</li><li>Sentiment Analyst</li><li>News Analyst</li><li>Technicals Analyst</li></ul>
       </div>
       <div class="dept gone">
         <div class="dept-h">RESEARCH <span class="tag">TERMINATED</span></div>
-        <ul>
-          <li>Bull Researcher</li>
-          <li>Bear Researcher</li>
-          <li>Research Manager</li>
-        </ul>
+        <ul><li>Bull Researcher</li><li>Bear Researcher</li><li>Research Manager</li></ul>
       </div>
       <div class="dept gone">
         <div class="dept-h">RISK MANAGEMENT <span class="tag">TERMINATED</span></div>
-        <ul>
-          <li>Risk Committee</li>
-          <li>Conservative Debator</li>
-          <li>Aggressive Debator</li>
-        </ul>
+        <ul><li>Risk Committee</li><li>Conservative Debator</li><li>Aggressive Debator</li></ul>
       </div>
       <div class="dept gone">
         <div class="dept-h">MANAGEMENT <span class="tag">TERMINATED</span></div>
-        <ul>
-          <li>Portfolio Manager</li>
-        </ul>
+        <ul><li>Portfolio Manager</li></ul>
       </div>
       <div class="dept alive">
         <div class="dept-h">TRADING <span class="tag ok">ACTIVE</span></div>
-        <ul>
-          <li>The Trader</li>
-        </ul>
+        <ul><li>The Trader</li></ul>
         <p class="note">Reports to no one. Consults no one. Is consulted by no one.</p>
       </div>
     </div>
   </section>
 
   <section class="panel">
-    <h2>THE SURVIVING EMPLOYEE</h2>
-    <p class="lede">Upstream, the trader received an investment plan assembled from four analyst reports
-    and a bull/bear debate, reviewed by risk management and signed off by a portfolio manager. None of
-    that is produced any more. So we rewrote its instructions to describe its actual situation:</p>
+    <h2>HIS ACTUAL INSTRUCTIONS</h2>
+    <p class="lede">Upstream, he received an investment plan assembled from four analyst reports and a
+    bull/bear debate, reviewed by risk management and signed off by a portfolio manager. None of that is
+    produced any more, so we rewrote his instructions to describe his real situation:</p>
     <pre class="prompt">You are a trading agent. You are the only trading agent.
 
 There are no analyst reports, no research plan, and no risk
@@ -110,31 +119,25 @@ Provide a specific recommendation to buy, sell, or hold.
 
 You must decide without deliberation, because there is no
 one left to deliberate with.</pre>
-    <p class="fine">That is the system prompt, verbatim, from the fork. The research plan it is handed is
-    a constant that reads: <em>"No investment plan was provided. There are no analysts. There are no
-    researchers. There is no research manager. There is no risk assessment, because there is no risk
-    management."</em></p>
+    <p class="fine">That is the system prompt, verbatim, from the fork.</p>
   </section>
 
   <section class="panel" id="kept">
     <h2>WHAT WE DID NOT DELETE</h2>
     <p class="lede">The desk runs on a fork of <strong>Grok Build</strong>, SpaceXAI's terminal coding
-    agent — a harness that edits files, runs shell commands and manages long-running tasks. We changed
-    what it works on. We removed nothing from it.</p>
+    agent. We changed what it works on. We removed nothing from it.</p>
     <div class="kept">
       <p>Grok Build asks before it acts. It confirms destructive operations. It has a security policy,
       and this fork keeps it, unmodified.</p>
       <p>That restraint is not an oversight and it is not a missing punchline. An agent that executes
       shell commands without asking is not a joke, it is a loaded foot-gun pointed at whoever installs
       it. <strong>We removed a risk committee from a simulated trading firm. We did not remove safety
-      controls from a tool that touches real machines.</strong> The difference between those two things
-      is the entire point.</p>
+      controls from a tool that touches real machines.</strong></p>
     </div>
     <p class="fine">Upstream projects:
       <a href="https://github.com/TauricResearch/TradingAgents" target="_blank" rel="noopener">TradingAgents</a> (Apache-2.0) and
       <a href="https://github.com/xai-org/grok-build" target="_blank" rel="noopener">Grok Build</a> (Apache-2.0).
-      Both licences and their notices are retained. Neither project is affiliated with this one, and
-      neither has endorsed it.</p>
+      Both licences and their notices are retained. Neither project is affiliated with this one.</p>
   </section>
 
   <section class="panel">
@@ -159,7 +162,7 @@ one left to deliberate with.</pre>
   </div>
 </footer>
 
-<script src="config.js?v=1"></script>
-<script src="app.js?v=1"></script>
+<script src="config.js?v=2"></script>
+<script src="app.js?v=2"></script>
 </body>
 </html>
