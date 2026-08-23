@@ -22,11 +22,17 @@
 
   const TICKERS = ["SOL", "BONK", "WIF", "JUP", "PEPE", "TRUMP", "FARTCOIN", "$BUTTHOLE",
                    "a coin he saw once", "something ending in pump", "his own liquidity"];
-  const REASONS = [
-    "no analysis performed", "reason not given", "did not consult anyone",
-    "vibes, unaudited", "conviction: total, basis: none", "acted before thinking",
-    "no second opinion available", "risk committee unavailable (terminated)",
-    "read no reports", "confidence high, information zero",
+  // Every proposal sits unapproved, because the roles that could approve one
+  // were deleted. Nothing here executes; the status text says so each time.
+  const STATUS = [
+    "awaiting sign-off · approver: vacant",
+    "pending risk review · risk management: terminated",
+    "escalated to the portfolio manager · position abolished",
+    "queued behind nothing · still queued",
+    "requires a second opinion · none obtainable",
+    "sent for research validation · research dissolved",
+    "no analyst report attached · none exist",
+    "status: filed · status: filed · status: filed",
   ];
   const rand = (a) => a[Math.floor(Math.random() * a.length)];
   const now = () => new Date().toLocaleTimeString("en-US", { hour12: false });
@@ -59,17 +65,18 @@
   };
 
   const MILESTONES = {
-    5:   "HE HAS MADE FIVE TRADES.<br>NOBODY HAS REVIEWED ANY OF THEM.",
-    10:  "RISK MANAGEMENT WOULD HAVE FLAGGED THAT ONE.<br>RISK MANAGEMENT HAS BEEN TERMINATED.",
-    25:  "HE IS NOW TRADING FASTER.<br>THIS WAS NOT AUTHORISED. THERE IS NO ONE TO AUTHORISE IT.",
-    50:  "FIFTY TRADES. ZERO SECONDS OF DELIBERATION.<br>A COMMITTEE WOULD STILL BE READING THE FIRST REPORT.",
-    100: "ONE HUNDRED TRADES.<br>HE HAS NOW OUT-TRADED THE ENTIRE FIRM WE DELETED.",
-    250: "PLEASE STOP CLICKING HIM.<br>HE WILL NOT STOP. HE CANNOT. THERE IS NO OFF-BOARDING PROCESS.",
+    5:   "FIVE PROPOSALS FILED.<br>ZERO REVIEWED. THERE IS NO ONE TO REVIEW THEM.",
+    10:  "RISK MANAGEMENT WOULD HAVE ASSESSED THAT ONE.<br>RISK MANAGEMENT HAS BEEN TERMINATED.",
+    25:  "HE IS FILING FASTER NOW.<br>THE QUEUE IS NOT MOVING. THE QUEUE HAS NEVER MOVED.",
+    50:  "FIFTY PROPOSALS. ZERO SECONDS OF DELIBERATION.<br>ZERO APPROVALS. THE TWO FACTS ARE RELATED.",
+    100: "ONE HUNDRED FILED.<br>MORE THAN THE FIRM WE DELETED EVER REVIEWED.",
+    250: "PLEASE STOP CLICKING HIM.<br>HE WILL KEEP FILING. IT IS THE ONLY THING HE IS STILL ALLOWED TO DO.",
   };
 
   const doTrade = (big = false) => {
     trades++;
     $("trade-count").textContent = trades;
+    $("approved").textContent = "0";
 
     // he speeds up as he goes, because nobody is stopping him
     if (trades === 25) spinTime = 0.6;
@@ -86,10 +93,14 @@
     const side = Math.random() > 0.5 ? "BUY" : "SELL";
     const cls = side === "BUY" ? "buy" : "sell";
     const size = big ? "ENTIRE POSITION" : (Math.floor(Math.random() * 99) + 1) + "%";
-    addLog(`<span class="${cls}">${side}</span> ${size} · ${rand(TICKERS)} — <em>${rand(REASONS)}</em>`);
-    showPop(side, side === "BUY" ? "#22c55e" : "#ef4444");
+    addLog(
+      `<span class="id">#${String(trades).padStart(4, "0")}</span> ` +
+      `PROPOSES <span class="${cls}">${side}</span> ${size} · ${rand(TICKERS)} — ` +
+      `<em>${rand(STATUS)}</em>`
+    );
+    showPop("PROPOSED", side === "BUY" ? "#22c55e" : "#ef4444");
 
-    $("prod").textContent = trades === 1 ? "he did it immediately" : "again";
+    $("prod").textContent = trades === 1 ? "he filed it immediately" : "he filed another one";
     if (MILESTONES[trades]) flash(MILESTONES[trades]);
   };
 
@@ -99,7 +110,7 @@
   $("hotspot").addEventListener("click", (e) => {
     e.stopPropagation();
     doTrade(true);
-    addLog(`<span class="flag">MANUAL OVERRIDE</span> — someone pressed the thing on his face`, "");
+    addLog(`<span class="flag">EXPEDITED FILING REQUESTED</span> — someone pressed the thing on his face. It does not expedite anything.`, "");
     $("prod").textContent = "you pressed it";
     $("log-note").textContent = "he did not consent to that, but he also did not object";
   });

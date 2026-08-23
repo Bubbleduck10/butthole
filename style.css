@@ -147,3 +147,8 @@ footer .fine strong { color: var(--txt); }
   .hero h1 { font-size: 2.1rem; }
   .hero-bot { order: -1; }
 }
+
+/* proposal queue additions */
+.disclaim { margin-top: 12px; max-width: 400px; text-align: center; font-size: .72rem;
+  color: #5f5f66; line-height: 1.55; }
+.log li .id { color: #55555c; margin-right: 8px; }

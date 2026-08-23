@@ -6,7 +6,7 @@
 <title>butthole.bot — a trading desk with no risk management</title>
 <meta name="description" content="We forked a 99,293-star institutional trading framework and deleted the analysts, the researchers, the portfolio managers and the entire risk committee. One employee survived. Click him.">
 <meta property="og:title" content="butthole.bot">
-<meta property="og:description" content="86 files changed. 10,783 deletions. One employee left. Click him and he trades.">
+<meta property="og:description" content="86 files changed. 10,783 deletions. One employee left. He files proposals nobody can approve.">
 <meta property="og:image" content="assets/banner.jpg">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%230c0c0d'/><circle cx='50' cy='50' r='30' fill='%23e8683c'/><circle cx='50' cy='50' r='11' fill='%23fff5ee'/></svg>">
 <link rel="stylesheet" href="style.css">
@@ -27,7 +27,7 @@
 
     <div class="hero-copy">
       <p class="eyebrow">SOLE SURVIVING EMPLOYEE</p>
-      <h1>He has no analysts.<br>He has no risk&nbsp;committee.<br>He trades anyway.</h1>
+      <h1>He has no analysts.<br>He has no risk&nbsp;committee.<br>He files anyway.</h1>
       <p class="sub">We forked a <strong id="stars">99,293</strong>-star institutional trading framework
       and deleted the analysts, the researchers, the portfolio managers, and the entire risk management
       department. <strong>86 files. 10,783 deletions.</strong> He is what was left.</p>
@@ -45,11 +45,13 @@
       </div>
       <p class="prod" id="prod">click him</p>
       <div class="tally">
-        <span class="tally-k">TRADES EXECUTED</span>
+        <span class="tally-k">PROPOSALS FILED</span>
         <span class="tally-v" id="trade-count">0</span>
-        <span class="tally-k">DELIBERATION</span>
-        <span class="tally-v red">0.00s</span>
+        <span class="tally-k">APPROVED</span>
+        <span class="tally-v red" id="approved">0</span>
       </div>
+      <p class="disclaim">He files proposals. Nothing executes them. There is no one left to approve
+      one, and this website has never placed an order in its life.</p>
     </div>
 
   </div>
@@ -58,8 +60,8 @@
 <!-- ============ execution log ============ -->
 <section class="logwrap">
   <div class="wrap">
-    <div class="log-h"><span>EXECUTION LOG</span><span class="log-note" id="log-note">unsupervised · unreviewed · unstoppable</span></div>
-    <ul id="log" class="log"><li class="idle">awaiting instruction from a supervisor who does not exist</li></ul>
+    <div class="log-h"><span>PROPOSAL QUEUE</span><span class="log-note" id="log-note">pending sign-off from a role that no longer exists</span></div>
+    <ul id="log" class="log"><li class="idle">queue empty · approver: vacant · estimated wait: indefinite</li></ul>
   </div>
 </section>
 
@@ -162,7 +164,7 @@ one left to deliberate with.</pre>
   </div>
 </footer>
 
-<script src="config.js?v=3"></script>
-<script src="app.js?v=3"></script>
+<script src="config.js?v=4"></script>
+<script src="app.js?v=4"></script>
 </body>
 </html>
