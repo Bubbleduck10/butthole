@@ -8,8 +8,8 @@ const CONFIG = {
 
   contractAddress: "",          // <-- paste CA at launch (empty = pre-launch)
 
-  twitterUrl: "https://x.com/yourhandle",
-  loreUrl: "https://x.com/yourhandle",
+  twitterUrl: "https://x.com/Buttholebot_",
+  loreUrl: "https://x.com/Buttholebot_",
 
   // The numbers on this site are real. These come from the fork's diffstat.
   deletion: {
