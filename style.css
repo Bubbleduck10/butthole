@@ -152,3 +152,33 @@ footer .fine strong { color: var(--txt); }
 .disclaim { margin-top: 12px; max-width: 400px; text-align: center; font-size: .72rem;
   color: #5f5f66; line-height: 1.55; }
 .log li .id { color: #55555c; margin-right: 8px; }
+
+/* ---------- filing section ---------- */
+.filing { border-bottom: 1px solid var(--line); background: #08080a; padding: 44px 0 48px; }
+.filing-in { display: grid; grid-template-columns: 1fr 1fr; gap: 34px; align-items: start; }
+.form { background: var(--panel); border: 1px solid var(--line); border-left: 3px solid var(--orange);
+  padding: 24px 26px; }
+.form-h { font-family: var(--mono); font-size: .72rem; letter-spacing: .18em; color: var(--orange); }
+.form-note { font-size: .8rem; color: var(--dim); margin: 8px 0 20px; }
+.fl { display: block; font-family: var(--mono); font-size: .64rem; letter-spacing: .14em;
+  color: var(--dim); margin: 14px 0 6px; }
+.fl-dim { color: #55555c; letter-spacing: .06em; }
+.fi { width: 100%; background: #08080a; border: 1px solid var(--line); color: var(--txt);
+  font-family: var(--mono); font-size: .84rem; padding: 10px 12px; outline: none; resize: vertical; }
+.fi:focus { border-color: var(--orange); }
+.fi.bad { border-color: var(--red); animation: shake .3s; }
+@keyframes shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-5px)} 75%{transform:translateX(5px)} }
+.frow { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.counter { text-align: right; font-family: var(--mono); font-size: .66rem; color: #55555c; margin-top: 5px; }
+.check { display: flex; gap: 10px; align-items: flex-start; margin: 16px 0 20px;
+  font-size: .8rem; color: var(--dim); cursor: pointer; }
+.check input { margin-top: 3px; accent-color: var(--orange); flex: none; }
+.form .btn { width: 100%; text-align: center; }
+.form-err { margin-top: 12px; font-family: var(--mono); font-size: .74rem; color: var(--red);
+  opacity: 0; transition: opacity .2s; }
+.form-err.show { opacity: 1; }
+.form-err.ok { color: var(--green); }
+.queue .log { max-height: 300px; }
+.queue .fine { margin-top: 14px; }
+
+@media (max-width: 860px) { .filing-in { grid-template-columns: 1fr; } }

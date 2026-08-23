@@ -33,6 +33,7 @@
       department. <strong>86 files. 10,783 deletions.</strong> He is what was left.</p>
       <div class="cta">
         <a id="buy" class="btn" target="_blank" rel="noopener">BUY $BUTTHOLE ›</a>
+        <a href="#file" class="btn ghost">FILE A PROPOSAL ›</a>
         <a href="#roster" class="btn ghost">SEE WHO WE FIRED ›</a>
       </div>
     </div>
@@ -50,18 +51,63 @@
         <span class="tally-k">APPROVED</span>
         <span class="tally-v red" id="approved">0</span>
       </div>
-      <p class="disclaim">He files proposals. Nothing executes them. There is no one left to approve
-      one, and this website has never placed an order in its life.</p>
+      <p class="disclaim">Nothing here executes. Proposals are filed to a queue whose approver was
+      deleted, and this website has never placed an order in its life.</p>
     </div>
 
   </div>
 </section>
 
-<!-- ============ execution log ============ -->
-<section class="logwrap">
-  <div class="wrap">
-    <div class="log-h"><span>PROPOSAL QUEUE</span><span class="log-note" id="log-note">pending sign-off from a role that no longer exists</span></div>
-    <ul id="log" class="log"><li class="idle">queue empty · approver: vacant · estimated wait: indefinite</li></ul>
+<!-- ============ file a proposal ============ -->
+<section class="filing" id="file">
+  <div class="wrap filing-in">
+
+    <form id="form" class="form" novalidate>
+      <div class="form-h">FORM TP-1 · TRADE PROPOSAL</div>
+      <p class="form-note">The firm had no risk controls. This form does. Complete every field.</p>
+
+      <label class="fl" for="f-asset">ASSET</label>
+      <input id="f-asset" class="fi" type="text" maxlength="64" spellcheck="false"
+             placeholder="ticker, mint address, or a vibe you had">
+
+      <div class="frow">
+        <div>
+          <label class="fl" for="f-side">DIRECTION</label>
+          <select id="f-side" class="fi">
+            <option value="BUY">BUY</option>
+            <option value="SELL">SELL</option>
+            <option value="HOLD">HOLD</option>
+          </select>
+        </div>
+        <div>
+          <label class="fl" for="f-size">SIZE (% OF POSITION)</label>
+          <input id="f-size" class="fi" type="number" min="1" max="100" value="10">
+        </div>
+      </div>
+
+      <label class="fl" for="f-why">RATIONALE <span class="fl-dim">(minimum 40 characters)</span></label>
+      <textarea id="f-why" class="fi" rows="3" maxlength="400"
+                placeholder="Write anything. It will not be read, but it must be long enough to look like it could have been."></textarea>
+      <div class="counter"><span id="f-count">0</span>/40</div>
+
+      <label class="check">
+        <input id="f-ack" type="checkbox">
+        <span>I acknowledge that no analyst report is attached to this proposal, because there are
+        no analysts.</span>
+      </label>
+
+      <button id="submit" class="btn" type="submit">FILE PROPOSAL ›</button>
+      <p id="form-err" class="form-err"></p>
+    </form>
+
+    <div class="queue">
+      <div class="log-h"><span>PROPOSAL QUEUE</span><span class="log-note" id="log-note">pending sign-off from a role that no longer exists</span></div>
+      <ul id="log" class="log"><li class="idle">queue empty · approver: vacant · estimated wait: indefinite</li></ul>
+      <p class="fine" id="queue-note">Filed proposals stay in this queue. They are never approved,
+      because approval requires a portfolio manager, and the portfolio manager was deleted in commit
+      <code>Dissolve the firm</code>.</p>
+    </div>
+
   </div>
 </section>
 
@@ -164,7 +210,7 @@ one left to deliberate with.</pre>
   </div>
 </footer>
 
-<script src="config.js?v=4"></script>
-<script src="app.js?v=4"></script>
+<script src="config.js?v=5"></script>
+<script src="app.js?v=5"></script>
 </body>
 </html>
