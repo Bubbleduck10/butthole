@@ -11,8 +11,9 @@
   $("mint-line").textContent = CONFIG.contractAddress
     ? "mint " + CONFIG.contractAddress
     : "mint not yet announced";
-  const buyUrl = (ca) =>
-    `https://app.uniswap.org/swap?outputCurrency=${ca}&chain=mainnet`;
+  // Uniswap's own interface has no slug for chain 4663, so point buyers at the
+  // DexScreener token page, which lists every pool on this chain with a swap link.
+  const buyUrl = (ca) => `https://dexscreener.com/${CONFIG.chain}/${ca}`;
   $("buy").href = CONFIG.contractAddress ? buyUrl(CONFIG.contractAddress) : CONFIG.twitterUrl;
   if (!CONFIG.contractAddress) $("buy").textContent = "FOLLOW THE LAUNCH ›";
 
@@ -241,6 +242,7 @@
 
   $("w-addr").textContent = W;
   $("w-link").href = `${CONFIG.explorer}/address/${W}`;
+  $("w-chain").textContent = CONFIG.chainName;
 
   const readBook = async () => {
     // native balance — always readable, token or no token
@@ -276,7 +278,7 @@
       // few blocks behind the one that answered eth_blockNumber. Asking for "latest"
       // then trips "block range extends beyond current head block", so pin an explicit
       // toBlock a little short of the head and run the two queries one after the other.
-      const to = Math.max(0, head - 25);
+      const to = Math.max(0, head - 50);
       const q = (from, topics) => call(CONFIG.logsRpc, "eth_getLogs", [{
         fromBlock: "0x" + Math.max(0, from).toString(16),
         toBlock: "0x" + to.toString(16),
@@ -287,14 +289,15 @@
       // which arrives as a truncated body rather than an error. Shrink the horizon
       // and retry so a spike shortens the feed instead of emptying it.
       let out, incoming, span;
-      for (const win of [CONFIG.logsWindow, 1500, 300]) {
+      const ladder = [CONFIG.logsWindow, ...CONFIG.logsFallbacks];
+      for (const win of ladder) {
         try {
           out = await q(to - win, [TRANSFER, topicAddr(W), null]);
           incoming = await q(to - win, [TRANSFER, null, topicAddr(W)]);
           span = win;
           break;
         } catch (e) {
-          if (win === 300) throw e;
+          if (win === ladder[ladder.length - 1]) throw e;
         }
       }
       const dec = Number(big(await ethCall(ca, "0x313ce567")));
@@ -302,7 +305,7 @@
         .sort((a, b) => Number(big(b.l.blockNumber)) - Number(big(a.l.blockNumber)))
         .slice(0, 8);
 
-      const hours = Math.round((span * 12) / 3600);
+      const hours = Math.round((span * CONFIG.secondsPerBlock) / 3600);
       if (!rows.length) {
         $("w-log").innerHTML =
           `<li class="idle">no transfers in the last ~${hours}h of blocks</li>`;
@@ -312,7 +315,7 @@
       $("w-log").innerHTML = "";
       rows.forEach(({ l, dir }) => {
         const bn = Number(big(l.blockNumber));
-        const mins = Math.round(((head - bn) * 12) / 60);
+        const mins = Math.round(((head - bn) * CONFIG.secondsPerBlock) / 60);
         const other = "0x" + (dir === "OUT" ? l.topics[2] : l.topics[1]).slice(-40);
         const li = document.createElement("li");
         li.innerHTML =

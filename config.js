@@ -5,11 +5,12 @@ const CONFIG = {
   name: "butthole.bot",
   ticker: "BUTTHOLE",
 
-  // ---- chain ----------------------------------------------
-  // Two different slugs for the same chain: DexScreener says
-  // "ethereum", GeckoTerminal says "eth". Both are needed.
-  chain: "ethereum",
-  gtNetwork: "eth",
+  // ---- chain: Robinhood Chain (Ethereum L2 rollup, chain id 4663) ----
+  // Both indexers happen to use the same slug here; they are separate
+  // fields because on most chains they differ.
+  chain: "robinhood",       // DexScreener chainId
+  gtNetwork: "robinhood",   // GeckoTerminal network
+  chainName: "Robinhood Chain",
 
   contractAddress: "",          // <-- paste token CA at launch (empty = pre-launch)
 
@@ -18,11 +19,16 @@ const CONFIG = {
   // anything and holds no key.
   wallet: "0x2be0e167909db604cd03e59b347c5e50ba11bbb1",
 
-  // Keyless public endpoints, both send CORS: *
-  rpc: "https://ethereum-rpc.publicnode.com", // balances
-  logsRpc: "https://eth.drpc.org",            // transfer logs (10k block cap, free tier)
-  logsWindow: 9000,                           // ~30h of blocks
-  explorer: "https://etherscan.io",
+  rpc: "https://rpc.mainnet.chain.robinhood.com",     // sends CORS: *
+  logsRpc: "https://rpc.mainnet.chain.robinhood.com", // same node serves getLogs
+
+  // This chain makes ~10 blocks a second, so block counts look nothing
+  // like Ethereum's: 1,000,000 blocks is about 29 hours, not four months.
+  secondsPerBlock: 0.104,
+  logsWindow: 1000000,
+  logsFallbacks: [200000, 40000],   // ~5.8h, ~1.2h if the wide query is refused
+
+  explorer: "https://robinhoodchain.blockscout.com",
 
   twitterUrl: "https://x.com/Buttholebot_",
   loreUrl: "https://x.com/Buttholebot_",
