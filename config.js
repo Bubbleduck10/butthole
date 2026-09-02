@@ -12,7 +12,7 @@ const CONFIG = {
   gtNetwork: "robinhood",   // GeckoTerminal network
   chainName: "Robinhood Chain",
 
-  contractAddress: "",          // <-- paste token CA at launch (empty = pre-launch)
+  contractAddress: "0x8545f354f95165309d6bbb4a9036fd881a3f4428",  // live; auto-discovery is the fallback
 
   // ---- the desk's only wallet ------------------------------
   // Read-only. The site queries this address; it never signs

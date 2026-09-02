@@ -268,7 +268,8 @@
 
   const applyToken = (ca, sym) => {
     CONFIG.contractAddress = ca;
-    symbol = sym || CONFIG.ticker;
+    // the contract spells it "Butthole"; the rest of the page is set in caps
+    symbol = (sym || CONFIG.ticker).toUpperCase();
     $("mint-line").textContent = "mint " + ca;
     $("buy").href = buyUrl(ca);
     $("buy").textContent = `BUY $${symbol} ›`;
