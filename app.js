@@ -212,7 +212,7 @@
     $("desk-state").textContent = "DESK: OPEN — ONE EMPLOYEE";
     $("desk-state").classList.add("live");
     $("buy").href = buyUrl(ca);
-    $("buy").textContent = "BUY $BUTTHOLE ›";
+    $("buy").textContent = `BUY $${symbol} ›`;
   };
 
   /* ---------------- the book (read-only wallet) ---------------- */
@@ -244,6 +244,93 @@
   $("w-link").href = `${CONFIG.explorer}/address/${W}`;
   $("w-chain").textContent = CONFIG.chainName;
 
+  // Read the symbol off the contract rather than assuming it, so the page can
+  // never label some other token as ours.
+  let symbol = CONFIG.ticker;
+  const hexToStr = (h) => {
+    let s = "";
+    for (let i = 0; i + 1 < h.length; i += 2) {
+      const c = parseInt(h.substr(i, 2), 16);
+      if (c) s += String.fromCharCode(c);
+    }
+    return s;
+  };
+  const decodeString = (hex) => {
+    const b = (hex || "").replace(/^0x/, "");
+    if (b.length <= 64) return hexToStr(b).trim();          // bytes32-style symbol
+    const len = parseInt(b.slice(64, 128), 16) || 0;
+    return hexToStr(b.slice(128, 128 + len * 2)).trim();
+  };
+  const readSymbol = async (ca) => {
+    try { return decodeString(await ethCall(ca, "0x95d89b41")) || CONFIG.ticker; }
+    catch { return CONFIG.ticker; }
+  };
+
+  const applyToken = (ca, sym) => {
+    CONFIG.contractAddress = ca;
+    symbol = sym || CONFIG.ticker;
+    $("mint-line").textContent = "mint " + ca;
+    $("buy").href = buyUrl(ca);
+    $("buy").textContent = `BUY $${symbol} ›`;
+    $("k-tok").textContent = `$${symbol} HELD`;
+  };
+
+  // Find the token with nobody pasting an address: look for transfers into the
+  // desk wallet, then keep only those caused by a transaction the desk wallet
+  // itself sent. An airdropped impostor fails that test, because its transfer
+  // was caused by somebody else's transaction — which is the whole reason this
+  // checks the sender instead of trusting a matching ticker.
+  let discovering = false;
+  const discoverToken = async () => {
+    if (CONFIG.contractAddress || discovering) return;
+    discovering = true;
+    try {
+      const head = Number(big(await call(CONFIG.logsRpc, "eth_blockNumber", [])));
+      const to = Math.max(0, head - 50);
+      let logs = null;
+      for (const win of [CONFIG.logsWindow, ...CONFIG.logsFallbacks]) {
+        try {
+          logs = await call(CONFIG.logsRpc, "eth_getLogs", [{
+            fromBlock: "0x" + Math.max(0, to - win).toString(16),
+            toBlock: "0x" + to.toString(16),
+            topics: [TRANSFER, null, topicAddr(W)],
+          }]);
+          break;
+        } catch { /* horizon too wide; try a shorter one */ }
+      }
+      if (!logs || !logs.length) return;
+
+      const seen = new Set();
+      const oldestFirst = logs.slice()
+        .sort((a, b) => Number(big(a.blockNumber)) - Number(big(b.blockNumber)));
+      let firstOwned = null;
+      for (const l of oldestFirst) {
+        const addr = l.address.toLowerCase();
+        if (seen.has(addr)) continue;
+        seen.add(addr);
+        // Anyone can airdrop tokens here, so cap the work: without this, a wallet
+        // spammed with hundreds of them would fire hundreds of calls per visitor.
+        if (seen.size > 25) break;
+        const tx = await call(CONFIG.rpc, "eth_getTransactionByHash", [l.transactionHash]);
+        if (!tx || (tx.from || "").toLowerCase() !== W.toLowerCase()) continue;
+
+        const sym = await readSymbol(l.address);
+        if (sym.toUpperCase() === CONFIG.ticker.toUpperCase()) {
+          applyToken(l.address, sym);       // ticker matches: certainly ours
+          return;
+        }
+        if (!firstOwned) firstOwned = { ca: l.address, sym };
+      }
+      // Nothing carried our ticker, so fall back to the earliest token this
+      // wallet acquired under its own transaction, labelled with its real symbol.
+      if (firstOwned) applyToken(firstOwned.ca, firstOwned.sym);
+    } catch {
+      /* chain unreachable; the next poll tries again */
+    } finally {
+      discovering = false;
+    }
+  };
+
   const readBook = async () => {
     // native balance — always readable, token or no token
     try {
@@ -254,8 +341,12 @@
       $("w-eth-n").textContent = "chain unreachable";
     }
 
+    if (!CONFIG.contractAddress) await discoverToken();
     const ca = CONFIG.contractAddress;
-    if (!ca) return;
+    if (!ca) {
+      $("w-tok-n").textContent = "watching the chain for the launch";
+      return;
+    }
 
     // token balance and share of supply
     try {
@@ -320,7 +411,7 @@
         const li = document.createElement("li");
         li.innerHTML =
           `<span class="${dir === "IN" ? "buy" : "sell"}">${dir}</span> ` +
-          `${units(big(l.data), dec, 2)} $BUTTHOLE · ` +
+          `${units(big(l.data), dec, 2)} $${symbol} · ` +
           `${dir === "OUT" ? "to" : "from"} <a href="${CONFIG.explorer}/address/${other}" ` +
           `target="_blank" rel="noopener">${short(other)}</a> ` +
           `<span class="t">${mins < 60 ? mins + "m" : Math.round(mins / 60) + "h"} ago</span>`;
