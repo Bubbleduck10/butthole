@@ -11,9 +11,9 @@
   $("mint-line").textContent = CONFIG.contractAddress
     ? "mint " + CONFIG.contractAddress
     : "mint not yet announced";
-  $("buy").href = CONFIG.contractAddress
-    ? "https://pump.fun/coin/" + CONFIG.contractAddress
-    : CONFIG.twitterUrl;
+  const buyUrl = (ca) =>
+    `https://app.uniswap.org/swap?outputCurrency=${ca}&chain=mainnet`;
+  $("buy").href = CONFIG.contractAddress ? buyUrl(CONFIG.contractAddress) : CONFIG.twitterUrl;
   if (!CONFIG.contractAddress) $("buy").textContent = "FOLLOW THE LAUNCH ›";
 
   /* ---------------- the employee (decorative; files nothing) ---------------- */
@@ -189,7 +189,8 @@
     return { price: +p.priceUsd, change: p.priceChange?.h24 ?? null, mcap: p.marketCap, vol: p.volume?.h24 };
   };
   const fromGeckoTerminal = async (ca) => {
-    const a = (await (await fetch(`${GT}/networks/${CONFIG.chain}/tokens/${ca}`)).json())?.data?.attributes;
+    // note: GeckoTerminal's slug for this chain differs from DexScreener's
+    const a = (await (await fetch(`${GT}/networks/${CONFIG.gtNetwork}/tokens/${ca}`)).json())?.data?.attributes;
     if (!a?.price_usd) return null;
     return { price: +a.price_usd, change: null,
              mcap: parseFloat(a.market_cap_usd ?? a.fdv_usd), vol: parseFloat(a.volume_usd?.h24 ?? 0) };
@@ -209,12 +210,130 @@
     $("m-price").className = "v " + (r.change == null ? "" : r.change >= 0 ? "green" : "red");
     $("desk-state").textContent = "DESK: OPEN — ONE EMPLOYEE";
     $("desk-state").classList.add("live");
-    $("buy").href = "https://pump.fun/coin/" + ca;
+    $("buy").href = buyUrl(ca);
     $("buy").textContent = "BUY $BUTTHOLE ›";
+  };
+
+  /* ---------------- the book (read-only wallet) ---------------- */
+  const W = CONFIG.wallet;
+  const TRANSFER = "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef";
+  const topicAddr = (a) => "0x" + a.toLowerCase().replace(/^0x/, "").padStart(64, "0");
+  const short = (a) => a.slice(0, 6) + "…" + a.slice(-4);
+
+  const call = async (url, method, params) => {
+    const r = await fetch(url, {
+      method: "POST", headers: { "content-type": "application/json" },
+      body: JSON.stringify({ jsonrpc: "2.0", id: 1, method, params }),
+    });
+    const j = await r.json();
+    if (j.error) throw new Error(j.error.message);
+    return j.result;
+  };
+  const ethCall = (to, data) => call(CONFIG.rpc, "eth_call", [{ to, data }, "latest"]);
+  const big = (hex) => BigInt(hex && hex !== "0x" ? hex : "0x0");
+
+  const units = (v, dec, dp = 4) => {
+    const base = 10n ** BigInt(dec);
+    const whole = v / base;
+    const frac = ((v % base) * 10n ** BigInt(dp)) / base;
+    return whole.toLocaleString() + "." + frac.toString().padStart(dp, "0");
+  };
+
+  $("w-addr").textContent = W;
+  $("w-link").href = `${CONFIG.explorer}/address/${W}`;
+
+  const readBook = async () => {
+    // native balance — always readable, token or no token
+    try {
+      const wei = big(await call(CONFIG.rpc, "eth_getBalance", [W, "latest"]));
+      $("w-eth").textContent = units(wei, 18, 4);
+      $("w-eth-n").textContent = wei === 0n ? "unfunded" : "live from chain";
+    } catch {
+      $("w-eth-n").textContent = "chain unreachable";
+    }
+
+    const ca = CONFIG.contractAddress;
+    if (!ca) return;
+
+    // token balance and share of supply
+    try {
+      const dec = Number(big(await ethCall(ca, "0x313ce567")));
+      const bal = big(await ethCall(ca, "0x70a08231" + topicAddr(W).slice(2)));
+      const sup = big(await ethCall(ca, "0x18160ddd"));
+      $("w-tok").textContent = units(bal, dec, 2);
+      $("w-tok-n").textContent = bal === 0n ? "holds none" : "held by the desk";
+      $("w-pct").textContent = sup > 0n
+        ? (Number((bal * 10000n) / sup) / 100).toFixed(2) + "%"
+        : "—";
+    } catch {
+      $("w-tok-n").textContent = "token not readable yet";
+    }
+
+    // transfers in and out, within the free-tier log window
+    try {
+      const head = Number(big(await call(CONFIG.logsRpc, "eth_blockNumber", [])));
+      // The logs endpoint is load balanced, so the node answering getLogs can sit a
+      // few blocks behind the one that answered eth_blockNumber. Asking for "latest"
+      // then trips "block range extends beyond current head block", so pin an explicit
+      // toBlock a little short of the head and run the two queries one after the other.
+      const to = Math.max(0, head - 25);
+      const q = (from, topics) => call(CONFIG.logsRpc, "eth_getLogs", [{
+        fromBlock: "0x" + Math.max(0, from).toString(16),
+        toBlock: "0x" + to.toString(16),
+        address: ca, topics,
+      }]);
+
+      // A very busy period can push the response past the endpoint's size limit,
+      // which arrives as a truncated body rather than an error. Shrink the horizon
+      // and retry so a spike shortens the feed instead of emptying it.
+      let out, incoming, span;
+      for (const win of [CONFIG.logsWindow, 1500, 300]) {
+        try {
+          out = await q(to - win, [TRANSFER, topicAddr(W), null]);
+          incoming = await q(to - win, [TRANSFER, null, topicAddr(W)]);
+          span = win;
+          break;
+        } catch (e) {
+          if (win === 300) throw e;
+        }
+      }
+      const dec = Number(big(await ethCall(ca, "0x313ce567")));
+      const rows = [...out.map((l) => ({ l, dir: "OUT" })), ...incoming.map((l) => ({ l, dir: "IN" }))]
+        .sort((a, b) => Number(big(b.l.blockNumber)) - Number(big(a.l.blockNumber)))
+        .slice(0, 8);
+
+      const hours = Math.round((span * 12) / 3600);
+      if (!rows.length) {
+        $("w-log").innerHTML =
+          `<li class="idle">no transfers in the last ~${hours}h of blocks</li>`;
+        $("w-note").textContent = `nothing moved · block ${head.toLocaleString()}`;
+        return;
+      }
+      $("w-log").innerHTML = "";
+      rows.forEach(({ l, dir }) => {
+        const bn = Number(big(l.blockNumber));
+        const mins = Math.round(((head - bn) * 12) / 60);
+        const other = "0x" + (dir === "OUT" ? l.topics[2] : l.topics[1]).slice(-40);
+        const li = document.createElement("li");
+        li.innerHTML =
+          `<span class="${dir === "IN" ? "buy" : "sell"}">${dir}</span> ` +
+          `${units(big(l.data), dec, 2)} $BUTTHOLE · ` +
+          `${dir === "OUT" ? "to" : "from"} <a href="${CONFIG.explorer}/address/${other}" ` +
+          `target="_blank" rel="noopener">${short(other)}</a> ` +
+          `<span class="t">${mins < 60 ? mins + "m" : Math.round(mins / 60) + "h"} ago</span>`;
+        $("w-log").appendChild(li);
+      });
+      $("w-note").textContent =
+        `${rows.length} shown · last ~${hours}h · block ${head.toLocaleString()}`;
+    } catch (e) {
+      $("w-note").textContent = "transfer log unavailable";
+    }
   };
 
   const ca = new URLSearchParams(location.search).get("ca");
   if (ca) CONFIG.contractAddress = ca;
   poll();
   setInterval(poll, CONFIG.pollMs);
+  readBook();
+  setInterval(readBook, CONFIG.walletPollMs);
 })();
